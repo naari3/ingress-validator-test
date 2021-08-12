@@ -1,0 +1,6 @@
+domain: my.domain
+layout:
+- go.kubebuilder.io/v3
+projectName: ingress-validator-test
+repo: github.com/naari3/ingress-validator-test
+version: "3"
