@@ -1,4 +1,4 @@
-domain: my.domain
+domain: naari3.net
 layout:
 - go.kubebuilder.io/v3
 projectName: ingress-validator-test
