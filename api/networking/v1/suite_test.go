@@ -18,7 +18,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
@@ -116,30 +115,3 @@ var _ = AfterSuite(func() {
 	err := testEnv.Stop()
 	Expect(err).ToNot(HaveOccurred())
 })
-
-func run(ctx context.Context, cfg *rest.Config, opts *envtest.WebhookInstallOptions) error {
-	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
-
-	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
-		Scheme:             scheme,
-		MetricsBindAddress: "localhost:8999",
-		Host:               opts.LocalServingHost,
-		Port:               opts.LocalServingPort,
-		CertDir:            opts.LocalServingCertDir,
-		LeaderElection:     false,
-	})
-	if err != nil {
-		return err
-	}
-
-	dec, err := admission.NewDecoder(scheme)
-	if err != nil {
-		return err
-	}
-	mgr.GetWebhookServer().Register("/validate-networking-v1beta1-ingress", &webhook.Admission{Handler: &networkingv1.IngressValidator{Decoder: dec}})
-
-	if err := mgr.Start(ctx); err != nil {
-		return err
-	}
-	return nil
-}

@@ -11,12 +11,30 @@ const testAnnotation = "alb.ingress.kubernetes.io/test"
 var _ = Describe("valid cases for Ingress validator", func() {
 	It("should allow creating Ingress with annotated test", func() {
 		ing := &netv1.Ingress{}
-		ing.Name = "allow-creating-namespaced"
+		ing.Name = "allow-creating"
 		ing.Namespace = "default"
-		ing.Annotations = map[string]string{testAnnotation: "hogefuga"}
-		ing.Spec.DefaultBackend = &netv1.IngressBackend{Service: &netv1.IngressServiceBackend{Name: "test", Port: netv1.ServiceBackendPort{
-			Number: 8080,
-		}}}
+		var prefix netv1.PathType
+		prefix = "Prefix"
+		ing.Annotations = map[string]string{testAnnotation: "test"}
+		ing.Spec.Rules = []netv1.IngressRule{
+			{
+				Host: "",
+				IngressRuleValue: netv1.IngressRuleValue{HTTP: &netv1.HTTPIngressRuleValue{Paths: []netv1.HTTPIngressPath{
+					{
+						Path:     "/",
+						PathType: &prefix,
+						Backend: netv1.IngressBackend{
+							Service: &netv1.IngressServiceBackend{
+								Name: "test",
+								Port: netv1.ServiceBackendPort{
+									Number: 80,
+								},
+							},
+						},
+					},
+				}}},
+			},
+		}
 		err := k8sClient.Create(ctx, ing)
 		Expect(err).NotTo(HaveOccurred())
 	})
@@ -25,12 +43,30 @@ var _ = Describe("valid cases for Ingress validator", func() {
 var _ = Describe("invalid cases for Ingress", func() {
 	It("should deny creating Ingress without annotated test", func() {
 		ing := &netv1.Ingress{}
-		ing.Name = "deny-creating-not-namespaced"
+		ing.Name = "deny-creating"
 		ing.Namespace = "default"
-		// ing.Annotations = map[string]string{groupNameAnnotation: "test"}
-		ing.Spec.DefaultBackend = &netv1.IngressBackend{Service: &netv1.IngressServiceBackend{Name: "test", Port: netv1.ServiceBackendPort{
-			Number: 8080,
-		}}}
+		var prefix netv1.PathType
+		prefix = "Prefix"
+		// ing.Annotations = map[string]string{testAnnotation: "test"}
+		ing.Spec.Rules = []netv1.IngressRule{
+			{
+				Host: "",
+				IngressRuleValue: netv1.IngressRuleValue{HTTP: &netv1.HTTPIngressRuleValue{Paths: []netv1.HTTPIngressPath{
+					{
+						Path:     "/",
+						PathType: &prefix,
+						Backend: netv1.IngressBackend{
+							Service: &netv1.IngressServiceBackend{
+								Name: "test",
+								Port: netv1.ServiceBackendPort{
+									Number: 80,
+								},
+							},
+						},
+					},
+				}}},
+			},
+		}
 		err := k8sClient.Create(ctx, ing)
 		Expect(err).To(HaveOccurred())
 	})
