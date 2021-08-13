@@ -25,7 +25,7 @@ func (v IngressValidator) Handle(ctx context.Context, req admission.Request) adm
 	if err := v.Decoder.Decode(req, ing); err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}
-	if err := pkg.ValidateGroupName(ing); err != nil {
+	if err := pkg.Validate(ing); err != nil {
 		return admission.Denied(err.Error())
 	}
 	return admission.Allowed("")

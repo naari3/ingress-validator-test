@@ -8,8 +8,8 @@ import (
 
 const testAnnotation = "alb.ingress.kubernetes.io/test"
 
-// ValidateGroupName checks the ingress annotation test is exists
-func ValidateGroupName(ing metav1.Object) error {
+// Validate checks the ingress annotation test is exists
+func Validate(ing metav1.Object) error {
 	_, found := ing.GetAnnotations()[testAnnotation]
 	if !found {
 		return fmt.Errorf("deny")
